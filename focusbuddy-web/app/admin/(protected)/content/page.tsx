@@ -18,8 +18,16 @@ function ContentPageInner() {
     const activeTab = useActiveTab("personalities");
 
     return (
-        <div className="flex flex-col gap-4">
-            <h1 className="text-xl font-semibold">Nội dung hệ thống</h1>
+        <div className="flex flex-col gap-5">
+            <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#483bfc]">
+                    Content
+                </p>
+                <h1>Nội dung hệ thống</h1>
+                <p className="text-sm font-semibold text-muted-foreground">
+                    Quản lý buddy, tính cách, prompt và rule ứng dụng.
+                </p>
+            </div>
             <Tabs tabs={TABS} defaultTab="personalities" />
 
             {activeTab === "personalities" && <PersonalityTable />}

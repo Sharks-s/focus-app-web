@@ -26,17 +26,14 @@ export function Tabs({
     }
 
     return (
-        <div className="flex gap-1 border-b">
+        <div className="admin-tabs">
             {tabs.map((tab) => {
                 const active = tab.key === activeTab;
                 return (
                     <button
                         key={tab.key}
                         onClick={() => selectTab(tab.key)}
-                        className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${active
-                                ? "border-black text-black"
-                                : "border-transparent text-muted-foreground hover:text-foreground"
-                            }`}
+                        className={active ? "active" : ""}
                     >
                         {tab.label}
                     </button>

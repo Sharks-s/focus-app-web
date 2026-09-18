@@ -17,43 +17,47 @@ export function LoginForm() {
             await login({ email, password });
             router.push("/admin/dashboard");
         } catch {
-            // error đã có trong store
+            // The store exposes the error message for rendering below.
         }
     }
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-sm">
-            <div className="flex flex-col gap-1">
-                <label htmlFor="email" className="text-sm font-medium">Email</label>
+        <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+                <label htmlFor="email" className="text-sm font-bold text-[#1a1b25]">
+                    Email
+                </label>
                 <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="border rounded-md px-3 py-2"
+                    className="px-3 py-2.5"
                 />
             </div>
 
-            <div className="flex flex-col gap-1">
-                <label htmlFor="password" className="text-sm font-medium">Mật khẩu</label>
+            <div className="flex flex-col gap-1.5">
+                <label htmlFor="password" className="text-sm font-bold text-[#1a1b25]">
+                    Mật khẩu
+                </label>
                 <input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="border rounded-md px-3 py-2"
+                    className="px-3 py-2.5"
                 />
             </div>
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && (
+                <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600">
+                    {error}
+                </p>
+            )}
 
-            <button
-                type="submit"
-                disabled={isLoading}
-                className="bg-black text-white rounded-md py-2 disabled:opacity-50"
-            >
+            <button type="submit" disabled={isLoading} className="py-2.5 disabled:opacity-50">
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
         </form>

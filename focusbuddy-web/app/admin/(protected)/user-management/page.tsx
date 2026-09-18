@@ -14,8 +14,16 @@ function UserManagementContent() {
     const activeTab = useActiveTab("users");
 
     return (
-        <div className="flex flex-col gap-4">
-            <h1 className="text-xl font-semibold">Quản lý người dùng</h1>
+        <div className="flex flex-col gap-5">
+            <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#483bfc]">
+                    People
+                </p>
+                <h1>Quản lý người dùng</h1>
+                <p className="text-sm font-semibold text-muted-foreground">
+                    Theo dõi tài khoản, trạng thái Premium và lịch sử giao dịch.
+                </p>
+            </div>
             <Tabs tabs={TABS} defaultTab="users" />
             {activeTab === "users" && <UsersTab />}
             {activeTab === "subscriptions" && <SubscriptionsTab />}
