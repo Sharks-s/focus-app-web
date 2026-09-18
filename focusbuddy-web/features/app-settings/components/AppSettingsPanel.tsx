@@ -20,20 +20,28 @@ export function AppSettingsPanel() {
     const [drafts, setDrafts] = useState<Record<string, string>>({});
 
     const categories = useMemo(() => {
-        const values = new Set((data ?? []).map((item) => item.category ?? "General"));
+        const values = new Set(
+            (data ?? []).map((item) => item.category ?? "General")
+        );
+
         return ["ALL", ...Array.from(values).sort()];
     }, [data]);
 
     const filtered = useMemo(() => {
         const needle = keyword.trim().toLowerCase();
+
         return (data ?? []).filter((item) => {
             const itemCategory = item.category ?? "General";
-            const matchesCategory = category === "ALL" || itemCategory === category;
+
+            const matchesCategory =
+                category === "ALL" || itemCategory === category;
+
             const matchesKeyword =
                 !needle ||
                 item.key.toLowerCase().includes(needle) ||
                 item.value.toLowerCase().includes(needle) ||
                 (item.description ?? "").toLowerCase().includes(needle);
+
             return matchesCategory && matchesKeyword;
         });
     }, [category, data, keyword]);
@@ -43,11 +51,18 @@ export function AppSettingsPanel() {
     }
 
     function setDraft(key: string, value: string) {
-        setDrafts((current) => ({ ...current, [key]: value }));
+        setDrafts((current) => ({
+            ...current,
+            [key]: value,
+        }));
     }
 
     async function save(item: AppSettingItem) {
-        await update.mutateAsync({ key: item.key, value: getDraft(item) });
+        await update.mutateAsync({
+            key: item.key,
+            value: getDraft(item),
+        });
+
         setDrafts((current) => {
             const next = { ...current };
             delete next[item.key];
@@ -55,40 +70,57 @@ export function AppSettingsPanel() {
         });
     }
 
-    const highlighted = filtered.filter((item) => IMPORTANT_KEYS.has(item.key));
-    const regular = filtered.filter((item) => !IMPORTANT_KEYS.has(item.key));
+    const highlighted = filtered.filter((item) =>
+        IMPORTANT_KEYS.has(item.key)
+    );
+
+    const regular = filtered.filter(
+        (item) => !IMPORTANT_KEYS.has(item.key)
+    );
 
     return (
         <div className="space-y-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold">App Settings</h1>
+                    <h1 className="text-2xl font-bold">
+                        Cài đặt ứng dụng
+                    </h1>
+
                     <p className="mt-1 text-sm text-muted-foreground">
-                        Chỉnh các giá trị runtime như seed, dailyFreeUsage, defaultCycleMinutes qua UI.
+                        Điều chỉnh các thiết lập hoạt động của ứng dụng như
+                        thời gian tập trung, giới hạn sử dụng và giá trị mặc
+                        định.
                     </p>
                 </div>
+
                 <div className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm text-muted-foreground">
                     <Settings2 className="h-4 w-4" />
-                    {isFetching ? "Đang đồng bộ..." : `${data?.length ?? 0} settings`}
+
+                    {isFetching
+                        ? "Đang cập nhật..."
+                        : `${data?.length ?? 0} cài đặt`}
                 </div>
             </div>
 
             {isError && (
                 <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-                    Không thể tải App Settings. Kiểm tra backend endpoint /admin/app-settings.
+                    Không thể tải danh sách cài đặt. Vui lòng kiểm tra kết nối
+                    với máy chủ.
                 </p>
             )}
 
             <div className="flex flex-wrap gap-2">
                 <div className="relative">
                     <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+
                     <input
                         value={keyword}
                         onChange={(event) => setKeyword(event.target.value)}
-                        placeholder="Tìm theo key, value, mô tả..."
+                        placeholder="Tìm theo tên, giá trị hoặc mô tả..."
                         className="w-80 rounded-md border py-2 pl-9 pr-3 text-sm"
                     />
                 </div>
+
                 <select
                     value={category}
                     onChange={(event) => setCategory(event.target.value)}
@@ -102,25 +134,39 @@ export function AppSettingsPanel() {
                 </select>
             </div>
 
-            {isPending && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+            {isPending && (
+                <p className="text-sm text-muted-foreground">
+                    Đang tải cài đặt...
+                </p>
+            )}
+
             {update.isError && (
                 <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-                    Lưu setting thất bại. Kiểm tra value type hoặc quyền admin.
+                    Không thể lưu cài đặt. Vui lòng kiểm tra giá trị nhập vào
+                    hoặc quyền quản trị.
                 </p>
             )}
 
             {highlighted.length > 0 && (
                 <section className="space-y-3">
-                    <h2 className="text-sm font-semibold uppercase text-muted-foreground">Quan trọng</h2>
+                    <h2 className="text-sm font-semibold uppercase text-muted-foreground">
+                        Cài đặt quan trọng
+                    </h2>
+
                     <div className="grid gap-3 xl:grid-cols-2">
                         {highlighted.map((item) => (
                             <SettingEditor
                                 key={item.key}
                                 item={item}
                                 value={getDraft(item)}
-                                dirty={drafts[item.key] != null && drafts[item.key] !== item.value}
+                                dirty={
+                                    drafts[item.key] != null &&
+                                    drafts[item.key] !== item.value
+                                }
                                 isSaving={update.isPending}
-                                onChange={(value) => setDraft(item.key, value)}
+                                onChange={(value) =>
+                                    setDraft(item.key, value)
+                                }
                                 onSave={() => save(item)}
                             />
                         ))}
@@ -129,21 +175,30 @@ export function AppSettingsPanel() {
             )}
 
             <section className="space-y-3">
-                <h2 className="text-sm font-semibold uppercase text-muted-foreground">Tất cả settings</h2>
+                <h2 className="text-sm font-semibold uppercase text-muted-foreground">
+                    Tất cả cài đặt
+                </h2>
+
                 {filtered.length === 0 && !isPending && (
                     <p className="rounded-md border px-3 py-6 text-center text-sm text-muted-foreground">
-                        Không tìm thấy setting phù hợp.
+                        Không tìm thấy cài đặt phù hợp.
                     </p>
                 )}
+
                 <div className="grid gap-3 xl:grid-cols-2">
                     {regular.map((item) => (
                         <SettingEditor
                             key={item.key}
                             item={item}
                             value={getDraft(item)}
-                            dirty={drafts[item.key] != null && drafts[item.key] !== item.value}
+                            dirty={
+                                drafts[item.key] != null &&
+                                drafts[item.key] !== item.value
+                            }
                             isSaving={update.isPending}
-                            onChange={(value) => setDraft(item.key, value)}
+                            onChange={(value) =>
+                                setDraft(item.key, value)
+                            }
                             onSave={() => save(item)}
                         />
                     ))}
@@ -175,15 +230,33 @@ function SettingEditor({
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="break-all font-mono text-sm font-semibold">{item.key}</h3>
-                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{item.valueType}</span>
+                        <h3 className="break-all font-mono text-sm font-semibold">
+                            {item.key}
+                        </h3>
+
+                        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                            {item.valueType}
+                        </span>
+
                         {item.category && (
-                            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700">{item.category}</span>
+                            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700">
+                                {item.category}
+                            </span>
                         )}
                     </div>
-                    {item.description && <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>}
+
+                    {item.description && (
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            {item.description}
+                        </p>
+                    )}
                 </div>
-                {dirty && <span className="shrink-0 text-xs font-medium text-amber-600">Chưa lưu</span>}
+
+                {dirty && (
+                    <span className="shrink-0 text-xs font-medium text-amber-600">
+                        Chưa lưu
+                    </span>
+                )}
             </div>
 
             <div className="mt-4 flex gap-2">
@@ -194,8 +267,8 @@ function SettingEditor({
                         onChange={(event) => onChange(event.target.value)}
                         className="w-40 rounded-md border px-3 py-2 text-sm disabled:bg-gray-50"
                     >
-                        <option value="true">true</option>
-                        <option value="false">false</option>
+                        <option value="true">Bật</option>
+                        <option value="false">Tắt</option>
                     </select>
                 ) : item.valueType === "JSON" ? (
                     <textarea
@@ -209,27 +282,44 @@ function SettingEditor({
                     <input
                         value={value}
                         disabled={!editable}
-                        type={item.valueType === "NUMBER" ? "number" : "text"}
+                        type={
+                            item.valueType === "NUMBER"
+                                ? "number"
+                                : "text"
+                        }
                         onChange={(event) => onChange(event.target.value)}
                         className="min-w-0 flex-1 rounded-md border px-3 py-2 text-sm disabled:bg-gray-50"
                     />
                 )}
+
                 <button
                     type="button"
                     disabled={!editable || !dirty || isSaving}
                     onClick={onSave}
                     className="inline-flex h-10 items-center gap-2 rounded-md bg-black px-3 text-sm text-white disabled:opacity-40"
-                    title="Lưu setting"
+                    title="Lưu cài đặt"
                 >
                     <Save className="h-4 w-4" />
-                    Lưu
+
+                    {isSaving ? "Đang lưu..." : "Lưu"}
                 </button>
             </div>
 
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                {item.defaultValue != null && <span>Default: {item.defaultValue}</span>}
-                {item.updatedAt && <span>Cập nhật: {new Date(item.updatedAt).toLocaleString("vi-VN")}</span>}
-                {!editable && <span>Readonly</span>}
+                {item.defaultValue != null && (
+                    <span>
+                        Giá trị mặc định: {item.defaultValue}
+                    </span>
+                )}
+
+                {item.updatedAt && (
+                    <span>
+                        Cập nhật:{" "}
+                        {new Date(item.updatedAt).toLocaleString("vi-VN")}
+                    </span>
+                )}
+
+                {!editable && <span>Chỉ xem</span>}
             </div>
         </div>
     );

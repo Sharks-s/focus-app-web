@@ -46,9 +46,6 @@ export function PetEditModal({
                 className="flex w-full max-w-md flex-col gap-4 rounded-lg bg-background p-6 shadow-xl"
             >
                 <h2 className="text-lg font-semibold">Sửa Pet — {pet.code}</h2>
-                <p className="text-xs text-muted-foreground">
-                    Code không thể đổi (animation gắn sẵn trong app, thay đổi code sẽ làm sai lệch client).
-                </p>
 
                 <div className="flex flex-col gap-1">
                     <label className="text-sm font-medium">Tên</label>
