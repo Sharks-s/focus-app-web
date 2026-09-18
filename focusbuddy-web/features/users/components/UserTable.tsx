@@ -81,6 +81,7 @@ export function UserTable({ onSelectUser }: { onSelectUser: (id: number) => void
                                 <th className="px-3 py-2">Trạng thái</th>
                                 <th className="px-3 py-2">Premium</th>
                                 <th className="px-3 py-2">Đăng nhập gần nhất</th>
+                                <th className="px-3 py-2">Vai trò</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -99,6 +100,7 @@ export function UserTable({ onSelectUser }: { onSelectUser: (id: number) => void
                                     <td className="px-3 py-2">
                                         {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString("vi-VN") : "—"}
                                     </td>
+                                    <td className="px-3 py-2">{u.role ?? "—"}</td>
                                 </tr>
                             ))}
                         </tbody>

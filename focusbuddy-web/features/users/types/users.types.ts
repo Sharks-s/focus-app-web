@@ -7,6 +7,7 @@ export interface AdminUserListItem {
     fullName: string | null;
     avatarUrl: string | null;
     status: UserStatus;
+    role: RoleCode | null;
     isPremium: boolean;
     lastLoginAt: string | null;
     createdAt: string;
@@ -49,7 +50,7 @@ export interface ListUsersParams {
 
 ///
 
-export type RoleCode = "ADMIN" | "USER";
+export type RoleCode = "USER" | "ADMIN" | "SUPER_ADMIN";
 
 export interface UpdateUserRoleRequest {
     roleCode: RoleCode;
