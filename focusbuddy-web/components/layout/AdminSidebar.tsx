@@ -9,6 +9,7 @@ import {
     FileSliders,
     LayoutDashboard,
     LogOut,
+    MessageSquareText,
     Settings2,
     ShieldCheck,
     Users,
@@ -24,6 +25,7 @@ interface SidebarItem {
 const ITEMS: SidebarItem[] = [
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { label: "Người dùng", href: "/admin/user-management", icon: Users },
+    { label: "Feedback", href: "/admin/feedback", icon: MessageSquareText },
     { label: "Nội dung", href: "/admin/content", icon: FileSliders },
     { label: "Vận hành", href: "/admin/monitoring", icon: ShieldCheck },
     { label: "Phân tích", href: "/admin/system-analytics", icon: BarChart3 },
@@ -55,6 +57,9 @@ export function AdminSidebar() {
             </div>
 
             <nav className="flex-1 overflow-y-auto px-3 py-4">
+                <p className="admin-sidebar-section px-3 pb-3 text-[11px] font-extrabold uppercase tracking-[0.18em]">
+                    Menu
+                </p>
                 <div className="flex flex-col gap-1.5">
                     {ITEMS.map((item) => {
                         const active = pathname.startsWith(item.href);
