@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fcf8ff;
+  --background: #f6f7fb;
   --foreground: #1a1b25;
-  --fb-primary: #483bfc;
-  --fb-primary-dark: #2b08e6;
-  --fb-primary-soft: #efecfb;
+  --fb-primary: #315efb;
+  --fb-primary-dark: #1d3fd7;
+  --fb-primary-soft: #eef3ff;
   --fb-panel: #ffffff;
-  --fb-panel-soft: #f8f6ff;
-  --fb-border: #e9e6f5;
-  --fb-border-strong: #c7c4da;
-  --fb-muted: #464557;
-  --fb-success: #047857;
-  --fb-danger: #b42318;
-  --fb-warning: #e37400;
-  --fb-shadow: 0 8px 24px -8px rgba(72, 59, 252, 0.16);
+  --fb-panel-soft: #f8fafc;
+  --fb-border: #e2e8f0;
+  --fb-border-strong: #cbd5e1;
+  --fb-muted: #475569;
+  --fb-success: #059669;
+  --fb-danger: #dc2626;
+  --fb-warning: #d97706;
+  --fb-shadow: 0 18px 45px -28px rgba(15, 23, 42, 0.28);
 }
 
 @theme inline {
@@ -63,28 +63,49 @@ input[type="radio"] {
 }
 
 .admin-shell {
-  background: var(--background);
+  background:
+    linear-gradient(135deg, rgba(49, 94, 251, 0.06), transparent 34%),
+    linear-gradient(315deg, rgba(20, 184, 166, 0.08), transparent 30%),
+    #f6f7fb;
   color: var(--foreground);
 }
 
 .admin-main {
   scrollbar-gutter: stable;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
 }
 
 .admin-main>div {
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
 .admin-sidebar {
-  background: #fcf8ff;
-  border-right: 1px solid #d8d3ea;
-  border-radius: 0 24px 24px 0;
-  box-shadow: 12px 0 30px -26px rgba(72, 59, 252, 0.35);
+  position: relative;
+  overflow: hidden;
+  color: #dbeafe;
+  background:
+    linear-gradient(180deg, rgba(49, 94, 251, 0.18), transparent 24%),
+    linear-gradient(155deg, #101828 0%, #172554 52%, #0f172a 100%);
+  border-right: 1px solid rgba(148, 163, 184, 0.24);
+  box-shadow: 24px 0 70px -48px rgba(15, 23, 42, 0.9);
 }
 
 .admin-brand {
-  border-bottom: 1px solid #ded9ef;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.12);
+}
+
+.admin-sidebar .admin-brand p:first-child,
+.admin-sidebar .admin-user-card p:first-child {
+  color: #ffffff;
+}
+
+.admin-sidebar .admin-brand p:last-child {
+  color: #93c5fd;
 }
 
 .admin-brand-mark {
@@ -93,10 +114,10 @@ input[type="radio"] {
   height: 42px;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(72, 59, 252, 0.12), rgba(72, 59, 252, 0.04));
-  border: 1px solid rgba(72, 59, 252, 0.12);
-  border-radius: 14px;
-  box-shadow: inset 0 2px 4px rgba(26, 27, 37, 0.04);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 16px;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.24);
 }
 
 .admin-nav-item {
@@ -105,8 +126,10 @@ input[type="radio"] {
   gap: 12px;
   min-height: 42px;
   padding: 10px 12px;
-  color: #464557;
-  border-radius: 14px;
+  position: relative;
+  color: #cbd5e1;
+  border: 1px solid transparent;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
@@ -114,19 +137,42 @@ input[type="radio"] {
 }
 
 .admin-nav-item:hover {
-  color: #1a1b25;
-  background: #f5f2ff;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .admin-nav-item-active {
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--fb-primary), var(--fb-primary-dark));
-  box-shadow: 0 10px 22px rgba(72, 59, 252, 0.22);
+  color: #0f172a;
+  background: linear-gradient(135deg, #ffffff, #dbeafe);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
 }
 
 .admin-nav-item-active:hover {
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--fb-primary), var(--fb-primary-dark));
+  color: #0f172a;
+  background: linear-gradient(135deg, #ffffff, #dbeafe);
+}
+
+.admin-nav-item-active::before {
+  position: absolute;
+  left: -6px;
+  width: 3px;
+  height: 20px;
+  content: "";
+  background: #38bdf8;
+  border-radius: 999px;
+}
+
+.admin-sidebar-section {
+  color: #7dd3fc;
+}
+
+.admin-sidebar .border-t {
+  border-color: rgba(226, 232, 240, 0.12);
+}
+
+.admin-sidebar svg.text-\[\#483bfc\] {
+  color: #93c5fd;
 }
 
 .admin-user-card {
@@ -134,10 +180,15 @@ input[type="radio"] {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background: #ffffff;
-  border: 1px solid var(--fb-border);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(72, 59, 252, 0.06);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(14px);
+}
+
+.admin-user-card p:last-child {
+  color: #bfdbfe;
 }
 
 .admin-user-avatar {
@@ -146,8 +197,8 @@ input[type="radio"] {
   height: 36px;
   flex: 0 0 36px;
   place-items: center;
-  color: #333189;
-  background: #dedaff;
+  color: #172554;
+  background: linear-gradient(135deg, #dbeafe, #bbf7d0);
   border-radius: 12px;
   font-weight: 900;
   outline: 2px solid #ffffff;
@@ -159,7 +210,7 @@ input[type="radio"] {
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  color: #dc2626;
+  color: #fecaca;
   background: transparent;
   border: 0;
   border-radius: 12px;
@@ -169,8 +220,8 @@ input[type="radio"] {
 }
 
 .admin-logout-btn:hover {
-  color: #b42318;
-  background: #fff1f2;
+  color: #ffffff;
+  background: rgba(248, 113, 113, 0.18);
 }
 
 .admin-tabs {
@@ -180,10 +231,11 @@ input[type="radio"] {
   gap: 2px;
   padding: 4px;
   overflow-x: auto;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.78);
   border: 1px solid var(--fb-border);
   border-radius: 999px;
-  box-shadow: 0 4px 20px rgba(26, 27, 37, 0.05);
+  box-shadow: 0 14px 34px -24px rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(16px);
 }
 
 .admin-tabs button {
@@ -201,20 +253,72 @@ input[type="radio"] {
 
 .admin-tabs button:hover {
   color: var(--fb-primary);
-  background: var(--fb-primary-soft);
+  background: #eef3ff;
 }
 
 .admin-tabs button.active {
   color: #ffffff;
-  background: var(--fb-primary);
-  box-shadow: 0 8px 18px rgba(72, 59, 252, 0.18);
+  background: linear-gradient(135deg, var(--fb-primary), #14b8a6);
+  box-shadow: 0 10px 20px rgba(49, 94, 251, 0.2);
+}
+
+.admin-header {
+  background: rgba(255, 255, 255, 0.76);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 14px 36px -34px rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(18px);
+}
+
+.admin-header-user {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  background: #ffffff;
+  border: 1px solid var(--fb-border);
+  border-radius: 16px;
+  box-shadow: 0 12px 28px -22px rgba(15, 23, 42, 0.5);
+}
+
+.admin-header-avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--fb-primary), #14b8a6);
+  border-radius: 12px;
+  font-weight: 900;
+}
+
+.admin-header-logout {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  color: #b91c1c;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 800;
+  transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.admin-header-logout:hover {
+  background: #ffe4e6;
+  box-shadow: 0 14px 28px -22px rgba(185, 28, 28, 0.7);
+  transform: translateY(-1px);
 }
 
 .admin-shell h1 {
   color: #1a1b25;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 800;
-  line-height: 32px;
+  line-height: 36px;
   letter-spacing: 0;
 }
 
@@ -242,10 +346,11 @@ input[type="radio"] {
 .admin-shell :is(section, div).rounded-md.border,
 .admin-shell :is(section, div).rounded-xl.border,
 .admin-shell :is(section, div).rounded-2xl.border {
-  background: var(--fb-panel);
+  background: rgba(255, 255, 255, 0.88);
   border-color: var(--fb-border);
-  border-radius: 24px;
+  border-radius: 22px;
   box-shadow: var(--fb-shadow);
+  backdrop-filter: blur(12px);
 }
 
 .admin-shell table {
@@ -262,7 +367,7 @@ input[type="radio"] {
 }
 
 .admin-shell thead {
-  background: #f5f2ff;
+  background: #f8fafc;
 }
 
 .admin-shell th {
@@ -276,7 +381,7 @@ input[type="radio"] {
 
 .admin-shell td {
   padding: 12px 14px;
-  border-top: 1px solid rgba(233, 230, 245, 0.78);
+  border-top: 1px solid rgba(226, 232, 240, 0.86);
   font-size: 13px;
   font-weight: 600;
   line-height: 18px;
@@ -287,15 +392,15 @@ input[type="radio"] {
 }
 
 .admin-shell tbody tr:hover {
-  background: #fbfaff;
+  background: #f8fbff;
 }
 
 .admin-shell input,
 .admin-shell select,
 .admin-shell textarea {
   color: #1a1b25;
-  background: #f8f6ff;
-  border: 1px solid #d8d3ea;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
   border-radius: 12px;
   outline: none;
   font-weight: 650;
@@ -306,8 +411,8 @@ input[type="radio"] {
 .admin-shell select:focus,
 .admin-shell textarea:focus {
   background: #ffffff;
-  border-color: rgba(72, 59, 252, 0.45);
-  box-shadow: 0 0 0 4px rgba(72, 59, 252, 0.08);
+  border-color: rgba(49, 94, 251, 0.5);
+  box-shadow: 0 0 0 4px rgba(49, 94, 251, 0.1);
 }
 
 .admin-shell button.bg-black,
@@ -332,7 +437,7 @@ input[type="radio"] {
 }
 
 .admin-shell .bg-muted {
-  background: #f5f2ff;
+  background: #eef3ff;
 }
 
 .admin-shell .text-violet-600,
@@ -342,7 +447,7 @@ input[type="radio"] {
 
 .admin-shell .bg-violet-50,
 .admin-shell .bg-sky-50 {
-  background: #f5f2ff;
+  background: #eef3ff;
 }
 
 .admin-shell .rounded-full {
@@ -397,6 +502,7 @@ input[type="radio"] {
   }
 
   .admin-sidebar .admin-brand p,
+  .admin-sidebar .admin-sidebar-section,
   .admin-sidebar .admin-nav-item span,
   .admin-sidebar .admin-user-card div:nth-child(2),
   .admin-sidebar .admin-user-card svg,
@@ -411,6 +517,15 @@ input[type="radio"] {
 
   .admin-main {
     padding: 16px;
+  }
+
+  .admin-header {
+    padding: 12px 16px;
+  }
+
+  .admin-header-user div,
+  .admin-header-logout span {
+    display: none;
   }
 }
 

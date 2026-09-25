@@ -7,6 +7,156 @@ import Link from 'next/link'
 /* ─── i18n ─── */
 type Lang = 'vi' | 'en'
 
+interface LandingStats {
+    totalFocusMinutes: number
+    completedSessions: number
+    completionRate: number
+    raisedBuddies: number
+}
+
+interface LandingTestimonial {
+    id?: number
+    name: string
+    role: string
+    avatar: string
+    text: string
+    color: string
+    rating: number
+}
+
+const EMPTY_LANDING_STATS: LandingStats = {
+    totalFocusMinutes: 0,
+    completedSessions: 0,
+    completionRate: 0,
+    raisedBuddies: 0,
+}
+
+const TESTIMONIAL_ACCENTS = [
+    { avatar: '/images/PANDO.png', color: '#483BFC' },
+    { avatar: '/images/FROGI.png', color: '#FA8A38' },
+    { avatar: '/images/MONKI.png', color: '#35C85E' },
+    { avatar: '/images/PIGGY.png', color: '#FF909E' },
+]
+
+const FALLBACK_TESTIMONIALS: LandingTestimonial[] = [
+    {
+        name: 'Minh Quân',
+        role: 'Sinh viên ĐH Bách Khoa',
+        avatar: '/images/PANDO.png',
+        text: 'Từ ngày dùng FocusBuddy, mình học đều hơn hẳn. App nhắc đúng lúc nên mình ít bị trôi qua TikTok giữa session.',
+        color: '#483BFC',
+        rating: 5,
+    },
+    {
+        name: 'Linh Nhi',
+        role: 'Freelance Designer',
+        avatar: '/images/FROGI.png',
+        text: 'Mình thích nhất phần nghỉ có thưởng. Làm xong một block tập trung thấy nhẹ đầu, không còn cảm giác bị ép quá.',
+        color: '#FA8A38',
+        rating: 5,
+    },
+    {
+        name: 'Văn Đức',
+        role: 'Lập trình viên remote',
+        avatar: '/images/MONKI.png',
+        text: 'FocusBuddy giúp mình giữ nhịp làm việc ở nhà tốt hơn. Nhìn streak tăng mỗi ngày cũng có động lực quay lại bàn làm việc.',
+        color: '#35C85E',
+        rating: 5,
+    },
+    {
+        name: 'Thu Hà',
+        role: 'Học sinh lớp 12',
+        avatar: '/images/PIGGY.png',
+        text: 'Ôn thi bằng Pomodoro trong FocusBuddy dễ theo hơn nhiều. Có buddy đi cùng nên mình bớt nản khi học các môn dài.',
+        color: '#FF909E',
+        rating: 5,
+    },
+]
+
+function normalizeTestimonial(item: Partial<LandingTestimonial>, index: number): LandingTestimonial | null {
+    const text = typeof item.text === 'string' ? item.text.trim() : ''
+    const rating = typeof item.rating === 'number' ? item.rating : 0
+
+    if (!text || rating < 4) return null
+
+    const accent = TESTIMONIAL_ACCENTS[index % TESTIMONIAL_ACCENTS.length]
+
+    return {
+        id: item.id,
+        name: item.name?.trim() || 'Người dùng FocusBuddy',
+        role: item.role?.trim() || 'Người dùng thực tế',
+        avatar: item.avatar || accent.avatar,
+        text,
+        color: item.color || accent.color,
+        rating: Math.min(5, Math.max(4, Math.round(rating))),
+    }
+}
+
+function useLandingStats() {
+    const [stats, setStats] = useState<LandingStats>(EMPTY_LANDING_STATS)
+
+    useEffect(() => {
+        let active = true
+
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/landing/stats')
+                const json = await response.json()
+                if (active && response.ok && json?.success && json.data) {
+                    setStats(json.data)
+                }
+            } catch {
+                if (active) setStats(EMPTY_LANDING_STATS)
+            }
+        }
+
+        loadStats()
+        return () => {
+            active = false
+        }
+    }, [])
+
+    return stats
+}
+
+function useLandingTestimonials() {
+    const [testimonials, setTestimonials] = useState<LandingTestimonial[]>(FALLBACK_TESTIMONIALS)
+
+    useEffect(() => {
+        let active = true
+
+        async function loadTestimonials() {
+            try {
+                const response = await fetch('/api/landing/testimonials')
+                const json = await response.json()
+                const rawItems = Array.isArray(json?.data) ? json.data : Array.isArray(json) ? json : []
+                const goodReviews = rawItems
+                    .map((item: Partial<LandingTestimonial>, index: number) => normalizeTestimonial(item, index))
+                    .filter((item: LandingTestimonial | null): item is LandingTestimonial => Boolean(item))
+
+                if (active && response.ok && goodReviews.length > 0) {
+                    setTestimonials(goodReviews)
+                }
+            } catch {
+                if (active) setTestimonials(FALLBACK_TESTIMONIALS)
+            }
+        }
+
+        loadTestimonials()
+        return () => {
+            active = false
+        }
+    }, [])
+
+    return testimonials
+}
+
+function formatCompact(n: number) {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`
+    if (n >= 1000) return `${(n / 1000).toFixed(n >= 100_000 ? 0 : 1).replace('.0', '')}K`
+    return String(Math.round(n))
+}
+
 const translations = {
     vi: {
         nav: { features: 'Tính năng', buddy: 'Buddy', how: 'Cách hoạt động', privacy: 'Bảo mật' },
@@ -74,7 +224,7 @@ const translations = {
         cycleNote: 'Mỗi lần học 25 phút bạn nhận 5 phút nghỉ, tích lũy thời gian nghỉ để nhận kinh nghiệm nâng cấp Buddy',
         statsTitle1: 'Con số',
         statsTitle2: 'nói lên tất cả',
-        statsLabels: ['Phút tập trung đã ghi nhận', 'Sessions Pomodoro hoàn thành', 'Người dùng báo cáo năng suất tăng', 'Buddy ảo đã được nuôi dưỡng'],
+        statsLabels: ['Phút tập trung đã ghi nhận', 'Sessions Pomodoro hoàn thành', 'Tỷ lệ hoàn thành session', 'Buddy ảo đã được nuôi dưỡng'],
         privacyBadge: 'Bảo mật & Riêng tư',
         privacyTitle1: 'Camera của bạn,',
         privacyTitle2: 'bí mật của bạn',
@@ -100,7 +250,7 @@ const translations = {
             { title: 'Hỗ trợ', links: ['Trung tâm hỗ trợ', 'Discord Community', 'Báo lỗi', 'Liên hệ'] },
             { title: 'Pháp lý', links: ['Chính sách bảo mật', 'Điều khoản sử dụng', 'Cookie Policy'] },
         ],
-        footerCopyright: '© 2024 FocusBuddy. Được làm với ❤️ tại Việt Nam.',
+        footerCopyright: '© 2026 FocusBuddy. Được làm bởi nhà Slytherin tại Việt Nam.',
         footerStatus: 'Tất cả hệ thống hoạt động bình thường',
     },
     en: {
@@ -169,7 +319,7 @@ const translations = {
         cycleNote: 'Every 25-minute session earns you 5 minutes of break, which accumulates into XP to level up your Buddy',
         statsTitle1: 'The numbers',
         statsTitle2: 'speak for themselves',
-        statsLabels: ['Minutes of focus recorded', 'Pomodoro sessions completed', 'Users reporting increased productivity', 'Virtual buddies raised'],
+        statsLabels: ['Minutes of focus recorded', 'Pomodoro sessions completed', 'Session completion rate', 'Virtual buddies raised'],
         privacyBadge: 'Security & Privacy',
         privacyTitle1: 'Your camera,',
         privacyTitle2: 'your secret',
@@ -582,15 +732,14 @@ function HeroSection() {
     )
 }
 
-/* ─── Marquee (mock data — giữ nguyên tiếng Việt, sẽ nối API sau) ─── */
+/* ─── Marquee ─── */
 function MarqueeSection() {
+    const stats = useLandingStats()
     const items = [
-        { icon: '⏱️', text: '2.8M phút tập trung', color: '#483BFC' },
-        { icon: '✅', text: '640K sessions hoàn thành', color: '#35C85E' },
-        { icon: '🔥', text: 'Streak dài nhất: 365 ngày', color: '#FA8A38' },
-        { icon: '🐼', text: '180K pet được nuôi dưỡng', color: '#483BFC' },
-        { icon: '📈', text: 'Năng suất tăng 47%', color: '#35C85E' },
-        { icon: '⭐', text: '4.9 sao từ người dùng', color: '#FA8A38' },
+        { icon: '⏱️', text: `${formatCompact(stats.totalFocusMinutes)} phút tập trung`, color: '#483BFC' },
+        { icon: '✅', text: `${formatCompact(stats.completedSessions)} sessions hoàn thành`, color: '#35C85E' },
+        { icon: '📈', text: `${stats.completionRate.toFixed(1).replace('.0', '')}% tỷ lệ hoàn thành`, color: '#35C85E' },
+        { icon: '🐼', text: `${formatCompact(stats.raisedBuddies)} pet được nuôi dưỡng`, color: '#483BFC' },
     ]
     const doubled = [...items, ...items]
 
@@ -821,18 +970,18 @@ function HowItWorksSection() {
     )
 }
 
-/* ─── Stats (mock data — giữ nguyên số liệu, chỉ dịch label/title) ─── */
+/* ─── Stats ─── */
 function StatsSection() {
     const { t } = useLang()
+    const stats = useLandingStats()
     const ref = useRef<HTMLDivElement>(null)
     const inView = useInView(ref)
-    const n1 = useCountUp(2800000, inView, 2500)
-    const n2 = useCountUp(640000, inView, 2200)
-    const n3 = useCountUp(47, inView, 1800)
-    const n4 = useCountUp(180000, inView, 2000)
-    const fmt = (n: number) => (n >= 1_000_000 ? (n / 1_000_000).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(0) + 'K' : String(n))
+    const n1 = useCountUp(stats.totalFocusMinutes, inView, 2500)
+    const n2 = useCountUp(stats.completedSessions, inView, 2200)
+    const n3 = useCountUp(stats.completionRate, inView, 1800)
+    const n4 = useCountUp(stats.raisedBuddies, inView, 2000)
 
-    const values = [fmt(n1), fmt(n2), n3.toString(), fmt(n4)]
+    const values = [formatCompact(n1), formatCompact(n2), n3.toFixed(1).replace('.0', ''), formatCompact(n4)]
     const suffixes = ['', '+', '%', '+']
     const meta = [
         { color: '#483BFC', bg: '#EEF0FF', icon: '📊' },
@@ -915,15 +1064,10 @@ function PrivacySection() {
     )
 }
 
-/* ─── Testimonials (mock data — giữ nguyên tiếng Việt, chỉ dịch tiêu đề section) ─── */
+/* ─── Testimonials ─── */
 function TestimonialsSection() {
     const { t } = useLang()
-    const testi = [
-        { name: 'Minh Quân', role: 'Sinh viên ĐH Bách Khoa', avatar: '/images/PANDO.png', text: 'Từ ngày dùng FocusBuddy, mình học được nhiều hơn trong 3 giờ so với cả ngày trước. Pando nghiêm khắc thật nhưng hiệu quả!', color: '#483BFC' },
-        { name: 'Linh Nhi', role: 'Freelance Designer', avatar: '/images/FROGI.png', text: 'Tính năng phát hiện khi mở Figma nhưng đang lướt Facebook thực sự đã thay đổi cách mình làm việc. Frogi kêu la ngay 😂', color: '#FA8A38' },
-        { name: 'Văn Đức', role: 'Lập trình viên remote', avatar: '/images/MONKI.png', text: 'Streak 90 ngày và tôi không thể tin mình làm được. Monki lên level 20 rồi, nhìn nó tiến bộ mà thấy vui ghê.', color: '#35C85E' },
-        { name: 'Thu Hà', role: 'Học sinh lớp 12', avatar: '/images/PIGGY.png', text: 'Ôn thi với FocusBuddy khác hẳn. Session xong được nghỉ đúng kiểu, không bị ép quá, không bị lười quá. Cân bằng thật!', color: '#FF909E' },
-    ]
+    const testi = useLandingTestimonials()
     const doubled = [...testi, ...testi]
 
     return (
@@ -947,7 +1091,7 @@ function TestimonialsSection() {
                                         <p className="text-xs font-medium" style={{ color: '#9ca3af' }}>{t2.role}</p>
                                     </div>
                                     <div className="flex gap-0.5">
-                                        {Array.from({ length: 5 }).map((_, j) => (
+                                        {Array.from({ length: t2.rating }).map((_, j) => (
                                             <span key={j} style={{ color: '#FA8A38' }}><IcoStar /></span>
                                         ))}
                                     </div>
