@@ -4,6 +4,13 @@ import React, { useState, useEffect, useRef, createContext, useContext } from 'r
 import Image from 'next/image'
 import Link from 'next/link'
 
+/* ─── Download ─── */
+// Link file cài đặt desktop app. Cấu hình qua biến môi trường NEXT_PUBLIC_DOWNLOAD_URL
+// (khi ra bản mới có thể ghi đè mà không cần sửa code). Mặc định lấy file trên GitHub Releases.
+const DOWNLOAD_URL =
+    process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
+    'https://github.com/Sharks-s/EXE/releases/download/v0.1.0/FocusBuddy_0.1.0_x64-setup.exe'
+
 /* ─── i18n ─── */
 type Lang = 'vi' | 'en'
 
@@ -162,7 +169,7 @@ const translations = {
         nav: { features: 'Tính năng', buddy: 'Buddy', how: 'Cách hoạt động', privacy: 'Bảo mật' },
         downloadFree: 'Tải miễn phí',
         downloadFreeFull: 'Tải về miễn phí',
-        downloadSub: 'Windows 10/11 · 45MB',
+        downloadSub: 'Windows 10/11 · ~170MB',
         watchDemo: 'Xem demo',
         heroBadge: 'Miễn phí hoàn toàn · Không cần tài khoản',
         heroTitleLine1: 'Buddy đồng hành.',
@@ -257,7 +264,7 @@ const translations = {
         nav: { features: 'Features', buddy: 'Buddy', how: 'How it works', privacy: 'Privacy' },
         downloadFree: 'Free download',
         downloadFreeFull: 'Download for free',
-        downloadSub: 'Windows 10/11 · 45MB',
+        downloadSub: 'Windows 10/11 · ~170MB',
         watchDemo: 'Watch demo',
         heroBadge: 'Completely free · No account required',
         heroTitleLine1: 'A buddy that stays.',
@@ -535,10 +542,10 @@ function Navbar() {
 
                 <div className="hidden md:flex items-center gap-3">
                     <LanguageSwitcher />
-                    <button className="lp-btn-primary px-5 py-2.5 text-sm flex items-center gap-2">
+                    <a id="nav-download-btn" href={DOWNLOAD_URL} download className="lp-btn-primary px-5 py-2.5 text-sm flex items-center gap-2">
                         <IcoDownload />
                         <span>{t.downloadFree}</span>
-                    </button>
+                    </a>
                 </div>
 
                 <button className="md:hidden" style={{ color: '#483BFC' }} onClick={() => setOpen(!open)}>
@@ -567,10 +574,10 @@ function Navbar() {
                         </a>
                     ))}
                     <LanguageSwitcher variant="mobile" />
-                    <button className="lp-btn-primary px-5 py-3 text-sm flex items-center justify-center gap-2 mt-1">
+                    <a id="mobile-download-btn" href={DOWNLOAD_URL} download className="lp-btn-primary px-5 py-3 text-sm flex items-center justify-center gap-2 mt-1">
                         <IcoDownload />
                         <span>{t.downloadFree}</span>
-                    </button>
+                    </a>
                 </div>
             )}
         </header>
@@ -686,13 +693,13 @@ function HeroSection() {
                 </p>
 
                 <div className="lp-hero-cta flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                    <button className="lp-btn-primary px-9 py-4 text-lg flex items-center gap-3">
+                    <a id="hero-download-btn" href={DOWNLOAD_URL} download className="lp-btn-primary px-9 py-4 text-lg flex items-center gap-3">
                         <IcoDownload />
                         <div className="text-left">
                             <div className="font-bold leading-none">{t.downloadFreeFull}</div>
                             <div className="text-xs opacity-75 font-medium mt-0.5">{t.downloadSub}</div>
                         </div>
-                    </button>
+                    </a>
                     <button className="lp-btn-outline px-9 py-4 text-lg flex items-center gap-2.5 bg-white">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
                         <span>{t.watchDemo}</span>
@@ -1143,13 +1150,13 @@ function DownloadSection() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-10">
-                    <button className="lp-btn-primary px-10 py-4 text-lg flex items-center gap-4 w-full sm:w-auto justify-center">
+                    <a id="cta-download-btn" href={DOWNLOAD_URL} download className="lp-btn-primary px-10 py-4 text-lg flex items-center gap-4 w-full sm:w-auto justify-center">
                         <IcoDownload />
                         <div className="text-left">
                             <div className="font-bold leading-none">{t.downloadFreeFull}</div>
                             <div className="text-xs opacity-75 font-medium mt-0.5">{t.downloadSub}</div>
                         </div>
-                    </button>
+                    </a>
                     <div className="text-sm font-semibold space-y-1.5" style={{ color: '#6b7280' }}>
                         {t.ctaChecklist.map((c) => (
                             <div key={c} className="flex items-center gap-2">
@@ -1186,7 +1193,7 @@ function Footer() {
                             <ul className="space-y-2.5">
                                 {col.links.map((link) => (
                                     <li key={link}>
-                                        <a href="#" className="text-sm font-medium transition-colors" style={{ color: '#9ca3af' }}>{link}</a>
+                                        <a href={link === 'Tải về' || link === 'Download' ? DOWNLOAD_URL : '#'} className="text-sm font-medium transition-colors" style={{ color: '#9ca3af' }}>{link}</a>
                                     </li>
                                 ))}
                             </ul>
