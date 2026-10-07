@@ -9,7 +9,7 @@ import Link from 'next/link'
 // (khi ra bản mới có thể ghi đè mà không cần sửa code). Mặc định lấy file trên GitHub Releases.
 const DOWNLOAD_URL =
     process.env.NEXT_PUBLIC_DOWNLOAD_URL ||
-    'https://github.com/Sharks-s/EXE/releases/download/v0.1.0/FocusBuddy_0.1.0_x64-setup.exe'
+    'https://github.com/Sharks-s/EXE/releases/latest/download/FocusBuddy_x64-setup.exe' // luôn trỏ bản mới nhất, giữ tên asset cố định khi release
 
 /* ─── i18n ─── */
 type Lang = 'vi' | 'en'
