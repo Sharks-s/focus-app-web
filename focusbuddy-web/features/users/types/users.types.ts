@@ -8,7 +8,7 @@ export interface AdminUserListItem {
     avatarUrl: string | null;
     status: UserStatus;
     role: RoleCode | null;
-    isPremium: boolean;
+    premium: boolean;
     lastLoginAt: string | null;
     createdAt: string;
 }
@@ -27,7 +27,7 @@ export interface AdminUserDetailResponse {
     profileCompleted: boolean;
     personalityCode: string | null;
     roles: string[];
-    isPremium: boolean;
+    premium: boolean;
     lastLoginAt: string | null;
     createdAt: string;
     totalFocusSessions: number;
