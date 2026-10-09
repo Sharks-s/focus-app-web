@@ -57,7 +57,7 @@ export function UserDetailDrawer({
 
                         <div className="flex items-center gap-2">
                             <UserStatusBadge status={user.status} />
-                            {user.isPremium && (
+                            {user.premium && (
                                 <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700">
                                     Premium
                                 </span>

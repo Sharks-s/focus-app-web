@@ -96,7 +96,7 @@ export function UserTable({ onSelectUser }: { onSelectUser: (id: number) => void
                                     <td className="px-3 py-2">
                                         <UserStatusBadge status={u.status} />
                                     </td>
-                                    <td className="px-3 py-2">{u.isPremium ? "Có" : "Không"}</td>
+                                    <td className="px-3 py-2">{u.premium ? "Có" : "Không"}</td>
                                     <td className="px-3 py-2">
                                         {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString("vi-VN") : "—"}
                                     </td>

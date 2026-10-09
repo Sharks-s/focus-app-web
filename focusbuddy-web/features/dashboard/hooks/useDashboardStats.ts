@@ -76,7 +76,7 @@ export function useDashboardStats(rangeDays: GrowthRange = 7) {
         return isSameDay(new Date(u.lastLoginAt), today);
     }).length;
 
-    const premiumUsers = users.filter((u) => u.isPremium).length;
+    const premiumUsers = users.filter((u) => u.premium).length;
 
     const stats: DashboardStats = {
         totalUsers,

@@ -1,6 +1,7 @@
 // lib/serverFetch.ts
 
-const BE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://focusbuddy-api-lw5a.onrender.com";
+// const BE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://focusbuddy-api-lw5a.onrender.com";
+const BE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 export const ACCESS_COOKIE = "admin_access_token";
 export const REFRESH_COOKIE = "refresh_token";

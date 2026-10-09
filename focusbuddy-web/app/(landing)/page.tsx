@@ -352,7 +352,7 @@ const translations = {
             { title: 'Support', links: ['Help center', 'Discord Community', 'Report a bug', 'Contact'] },
             { title: 'Legal', links: ['Privacy policy', 'Terms of service', 'Cookie policy'] },
         ],
-        footerCopyright: '© 2024 FocusBuddy. Made with ❤️ in Vietnam.',
+        footerCopyright: '© 2026 FocusBuddy. Made by house Slytherin in Vietnam.',
         footerStatus: 'All systems operational',
     },
 }
