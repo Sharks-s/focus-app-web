@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, createContext, useContext } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 
 /* ─── Download ─── */
 // Link file cài đặt desktop app. Cấu hình qua biến môi trường NEXT_PUBLIC_DOWNLOAD_URL
@@ -45,41 +44,6 @@ const TESTIMONIAL_ACCENTS = [
     { avatar: '/images/PIGGY.png', color: '#FF909E' },
 ]
 
-const FALLBACK_TESTIMONIALS: LandingTestimonial[] = [
-    {
-        name: 'Minh Quân',
-        role: 'Sinh viên ĐH Bách Khoa',
-        avatar: '/images/PANDO.png',
-        text: 'Từ ngày dùng FocusBuddy, mình học đều hơn hẳn. App nhắc đúng lúc nên mình ít bị trôi qua TikTok giữa session.',
-        color: '#483BFC',
-        rating: 5,
-    },
-    {
-        name: 'Linh Nhi',
-        role: 'Freelance Designer',
-        avatar: '/images/FROGI.png',
-        text: 'Mình thích nhất phần nghỉ có thưởng. Làm xong một block tập trung thấy nhẹ đầu, không còn cảm giác bị ép quá.',
-        color: '#FA8A38',
-        rating: 5,
-    },
-    {
-        name: 'Văn Đức',
-        role: 'Lập trình viên remote',
-        avatar: '/images/MONKI.png',
-        text: 'FocusBuddy giúp mình giữ nhịp làm việc ở nhà tốt hơn. Nhìn streak tăng mỗi ngày cũng có động lực quay lại bàn làm việc.',
-        color: '#35C85E',
-        rating: 5,
-    },
-    {
-        name: 'Thu Hà',
-        role: 'Học sinh lớp 12',
-        avatar: '/images/PIGGY.png',
-        text: 'Ôn thi bằng Pomodoro trong FocusBuddy dễ theo hơn nhiều. Có buddy đi cùng nên mình bớt nản khi học các môn dài.',
-        color: '#FF909E',
-        rating: 5,
-    },
-]
-
 function normalizeTestimonial(item: Partial<LandingTestimonial>, index: number): LandingTestimonial | null {
     const text = typeof item.text === 'string' ? item.text.trim() : ''
     const rating = typeof item.rating === 'number' ? item.rating : 0
@@ -99,8 +63,16 @@ function normalizeTestimonial(item: Partial<LandingTestimonial>, index: number):
     }
 }
 
+function isLandingStats(value: unknown): value is LandingStats {
+    if (!value || typeof value !== 'object') return false
+
+    const stats = value as Record<keyof LandingStats, unknown>
+    const values = [stats.totalFocusMinutes, stats.completedSessions, stats.completionRate, stats.raisedBuddies]
+    return values.every((item) => typeof item === 'number' && Number.isFinite(item))
+}
+
 function useLandingStats() {
-    const [stats, setStats] = useState<LandingStats>(EMPTY_LANDING_STATS)
+    const [stats, setStats] = useState<LandingStats | null>(null)
 
     useEffect(() => {
         let active = true
@@ -109,11 +81,11 @@ function useLandingStats() {
             try {
                 const response = await fetch('/api/landing/stats')
                 const json = await response.json()
-                if (active && response.ok && json?.success && json.data) {
+                if (active && response.ok && json?.success && isLandingStats(json.data)) {
                     setStats(json.data)
                 }
             } catch {
-                if (active) setStats(EMPTY_LANDING_STATS)
+                if (active) setStats(null)
             }
         }
 
@@ -127,7 +99,7 @@ function useLandingStats() {
 }
 
 function useLandingTestimonials() {
-    const [testimonials, setTestimonials] = useState<LandingTestimonial[]>(FALLBACK_TESTIMONIALS)
+    const [testimonials, setTestimonials] = useState<LandingTestimonial[]>([])
 
     useEffect(() => {
         let active = true
@@ -141,11 +113,11 @@ function useLandingTestimonials() {
                     .map((item: Partial<LandingTestimonial>, index: number) => normalizeTestimonial(item, index))
                     .filter((item: LandingTestimonial | null): item is LandingTestimonial => Boolean(item))
 
-                if (active && response.ok && goodReviews.length > 0) {
-                    setTestimonials(goodReviews)
+                if (active) {
+                    setTestimonials(response.ok ? goodReviews : [])
                 }
             } catch {
-                if (active) setTestimonials(FALLBACK_TESTIMONIALS)
+                if (active) setTestimonials([])
             }
         }
 
@@ -169,8 +141,7 @@ const translations = {
         nav: { features: 'Tính năng', buddy: 'Buddy', how: 'Cách hoạt động', privacy: 'Bảo mật' },
         downloadFree: 'Tải miễn phí',
         downloadFreeFull: 'Tải về miễn phí',
-        downloadSub: 'Windows 10/11 · ~170MB',
-        watchDemo: 'Xem demo',
+        downloadSub: 'Windows 10/11 · ~185MB',
         heroBadge: 'Miễn phí hoàn toàn · Không cần tài khoản',
         heroTitleLine1: 'Buddy đồng hành.',
         heroYou: 'Bạn ',
@@ -264,8 +235,7 @@ const translations = {
         nav: { features: 'Features', buddy: 'Buddy', how: 'How it works', privacy: 'Privacy' },
         downloadFree: 'Free download',
         downloadFreeFull: 'Download for free',
-        downloadSub: 'Windows 10/11 · ~170MB',
-        watchDemo: 'Watch demo',
+        downloadSub: 'Windows 10/11 · ~185MB',
         heroBadge: 'Completely free · No account required',
         heroTitleLine1: 'A buddy that stays.',
         heroYou: 'You ',
@@ -596,9 +566,12 @@ function HeroSection() {
 
     // Reset typing effect when language changes
     useEffect(() => {
-        setTyped('')
-        setPi(0)
-        setDel(false)
+        const resetTimer = setTimeout(() => {
+            setTyped('')
+            setPi(0)
+            setDel(false)
+        }, 0)
+        return () => clearTimeout(resetTimer)
     }, [phrases])
 
     useEffect(() => {
@@ -611,8 +584,10 @@ function HeroSection() {
         } else if (del && typed.length > 0) {
             t = setTimeout(() => setTyped(typed.slice(0, -1)), 40)
         } else {
-            setDel(false)
-            setPi((i) => (i + 1) % phrases.length)
+            t = setTimeout(() => {
+                setDel(false)
+                setPi((i) => (i + 1) % phrases.length)
+            }, 0)
         }
         return () => clearTimeout(t)
     }, [typed, del, pi, phrases])
@@ -700,10 +675,6 @@ function HeroSection() {
                             <div className="text-xs opacity-75 font-medium mt-0.5">{t.downloadSub}</div>
                         </div>
                     </a>
-                    <button className="lp-btn-outline px-9 py-4 text-lg flex items-center gap-2.5 bg-white">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                        <span>{t.watchDemo}</span>
-                    </button>
                 </div>
 
                 <div className="relative flex justify-center">
@@ -742,12 +713,14 @@ function HeroSection() {
 /* ─── Marquee ─── */
 function MarqueeSection() {
     const stats = useLandingStats()
+    if (!stats || !Object.values(stats).some((value) => value > 0)) return null
+
     const items = [
-        { icon: '⏱️', text: `${formatCompact(stats.totalFocusMinutes)} phút tập trung`, color: '#483BFC' },
-        { icon: '✅', text: `${formatCompact(stats.completedSessions)} sessions hoàn thành`, color: '#35C85E' },
-        { icon: '📈', text: `${stats.completionRate.toFixed(1).replace('.0', '')}% tỷ lệ hoàn thành`, color: '#35C85E' },
-        { icon: '🐼', text: `${formatCompact(stats.raisedBuddies)} pet được nuôi dưỡng`, color: '#483BFC' },
-    ]
+        { value: stats.totalFocusMinutes, icon: '⏱️', text: `${formatCompact(stats.totalFocusMinutes)} phút tập trung`, color: '#483BFC' },
+        { value: stats.completedSessions, icon: '✅', text: `${formatCompact(stats.completedSessions)} sessions hoàn thành`, color: '#35C85E' },
+        { value: stats.completionRate, icon: '📈', text: `${stats.completionRate.toFixed(1).replace('.0', '')}% tỷ lệ hoàn thành`, color: '#35C85E' },
+        { value: stats.raisedBuddies, icon: '🐼', text: `${formatCompact(stats.raisedBuddies)} pet được nuôi dưỡng`, color: '#483BFC' },
+    ].filter((item) => item.value > 0)
     const doubled = [...items, ...items]
 
     return (
@@ -829,6 +802,8 @@ const PETS = [
     { img: '/images/MONKI.png', name: 'Monki', role: 'Monkey', personality: 'Hài hước & Năng động', color: '#35C85E', bg: '#EDFAF2', level: 8, xp: 320, quote: 'Ủa mở TikTok hả? Thôi 1 video thôi nha... 1 thôi á!' },
     { img: '/images/PIGGY.png', name: 'Piggy', role: 'Pig', personality: 'Dễ thương & Cổ vũ', color: '#FF909E', bg: '#FFF0F2', level: 5, xp: 180, quote: 'Bạn đã làm rất tốt rồi! Piggy tự hào về bạn lắm 🩷' },
 ]
+
+const SHOW_MOCK_PET_DETAILS = false
 
 function PetSection() {
     const { t } = useLang()
@@ -981,21 +956,28 @@ function HowItWorksSection() {
 function StatsSection() {
     const { t } = useLang()
     const stats = useLandingStats()
+    const safeStats = stats ?? EMPTY_LANDING_STATS
     const ref = useRef<HTMLDivElement>(null)
     const inView = useInView(ref)
-    const n1 = useCountUp(stats.totalFocusMinutes, inView, 2500)
-    const n2 = useCountUp(stats.completedSessions, inView, 2200)
-    const n3 = useCountUp(stats.completionRate, inView, 1800)
-    const n4 = useCountUp(stats.raisedBuddies, inView, 2000)
+    const n1 = useCountUp(safeStats.totalFocusMinutes, inView, 2500)
+    const n2 = useCountUp(safeStats.completedSessions, inView, 2200)
+    const n3 = useCountUp(safeStats.completionRate, inView, 1800)
+    const n4 = useCountUp(safeStats.raisedBuddies, inView, 2000)
+
+    if (!stats || !Object.values(stats).some((value) => value > 0)) return null
 
     const values = [formatCompact(n1), formatCompact(n2), n3.toFixed(1).replace('.0', ''), formatCompact(n4)]
-    const suffixes = ['', '+', '%', '+']
+    const suffixes = ['', '', '%', '']
     const meta = [
         { color: '#483BFC', bg: '#EEF0FF', icon: '📊' },
         { color: '#FA8A38', bg: '#FFF3EA', icon: '✅' },
         { color: '#35C85E', bg: '#EDFAF2', icon: '📈' },
         { color: '#FF909E', bg: '#FFF0F2', icon: '🐼' },
     ]
+    const rawValues = [safeStats.totalFocusMinutes, safeStats.completedSessions, safeStats.completionRate, safeStats.raisedBuddies]
+    const visibleStats = t.statsLabels
+        .map((label, index) => ({ label, value: values[index], suffix: suffixes[index], meta: meta[index], rawValue: rawValues[index] }))
+        .filter((item) => item.rawValue > 0)
 
     return (
         <section ref={ref} className="py-24 px-6" style={{ background: '#F7F8FF' }}>
@@ -1006,15 +988,15 @@ function StatsSection() {
                     </h2>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                    {t.statsLabels.map((label, i) => (
-                        <div key={i} className="lp-spotlight-card lp-card p-7 text-center lp-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
-                            <div className="w-12 h-12 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl" style={{ background: meta[i].bg }}>
-                                {meta[i].icon}
+                    {visibleStats.map((item, i) => (
+                        <div key={item.label} className="lp-spotlight-card lp-card p-7 text-center lp-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
+                            <div className="w-12 h-12 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl" style={{ background: item.meta.bg }}>
+                                {item.meta.icon}
                             </div>
-                            <div className="font-bold text-3xl md:text-4xl mb-1" style={{ color: meta[i].color }}>
-                                {values[i]}{suffixes[i]}
+                            <div className="font-bold text-3xl md:text-4xl mb-1" style={{ color: item.meta.color }}>
+                                {item.value}{item.suffix}
                             </div>
-                            <p className="text-xs font-semibold leading-snug" style={{ color: '#9ca3af' }}>{label}</p>
+                            <p className="text-xs font-semibold leading-snug" style={{ color: '#9ca3af' }}>{item.label}</p>
                         </div>
                     ))}
                 </div>
@@ -1076,6 +1058,8 @@ function TestimonialsSection() {
     const { t } = useLang()
     const testi = useLandingTestimonials()
     const doubled = [...testi, ...testi]
+
+    if (testi.length === 0) return null
 
     return (
         <section className="py-28 px-6 overflow-hidden" style={{ background: '#F7F8FF' }}>
@@ -1227,7 +1211,7 @@ export default function LandingPage() {
                     <HeroSection />
                     <MarqueeSection />
                     <FeaturesSection />
-                    <PetSection />
+                    {SHOW_MOCK_PET_DETAILS && <PetSection />}
                     <HowItWorksSection />
                     <StatsSection />
                     <PrivacySection />
