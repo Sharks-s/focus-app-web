@@ -33,7 +33,7 @@ export function UserTable({ onSelectUser }: { onSelectUser: (id: number) => void
         keyword: keyword || undefined,
         status: status || undefined,
         page,
-        size: 20,
+        size: 8,
     });
 
     return (
