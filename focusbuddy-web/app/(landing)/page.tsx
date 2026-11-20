@@ -402,6 +402,8 @@ function LanguageSwitcher({ variant = 'desktop' }: { variant?: 'desktop' | 'mobi
 /* ─── Hooks ─── */
 function useScrollReveal() {
     useEffect(() => {
+        const revealSelector = '.lp-reveal, .lp-reveal-left, .lp-reveal-right'
+        const observed = new WeakSet<Element>()
         const io = new IntersectionObserver(
             (entries) => {
                 entries.forEach((e) => {
@@ -410,8 +412,31 @@ function useScrollReveal() {
             },
             { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
         )
-        document.querySelectorAll('.lp-reveal, .lp-reveal-left, .lp-reveal-right').forEach((el) => io.observe(el))
-        return () => io.disconnect()
+
+        const observeRevealElement = (element: Element) => {
+            if (observed.has(element)) return
+            observed.add(element)
+            io.observe(element)
+        }
+
+        document.querySelectorAll(revealSelector).forEach(observeRevealElement)
+
+        const mutations = new MutationObserver((records) => {
+            records.forEach((record) => {
+                record.addedNodes.forEach((node) => {
+                    if (!(node instanceof Element)) return
+                    if (node.matches(revealSelector)) observeRevealElement(node)
+                    node.querySelectorAll(revealSelector).forEach(observeRevealElement)
+                })
+            })
+        })
+
+        mutations.observe(document.body, { childList: true, subtree: true })
+
+        return () => {
+            mutations.disconnect()
+            io.disconnect()
+        }
     }, [])
 }
 
@@ -785,9 +810,9 @@ function FeaturesSection() {
     const icons = [<IcoClock key="c" />, <IcoEye key="e" />, <IcoAI key="a" />, <IcoChart key="ch" />]
 
     return (
-        <section id="features" className="py-28 px-6 bg-white">
+        <section id="features" className="py-16 px-6 bg-white">
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-20 lp-reveal">
+                <div className="text-center mb-12 lp-reveal">
                     <div className="lp-badge-blue mb-6">{t.featuresBadge}</div>
                     <h2 className="text-4xl md:text-5xl font-bold mb-5 leading-tight" style={{ color: '#0C1141' }}>
                         {t.featuresTitle1}<br />
@@ -844,9 +869,9 @@ function PetSection() {
     const pet = PETS[active]
 
     return (
-        <section id="pets" className="py-28 px-6" style={{ background: '#F7F8FF' }}>
+        <section id="pets" className="py-16 px-6" style={{ background: '#F7F8FF' }}>
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-20 lp-reveal">
+                <div className="text-center mb-12 lp-reveal">
                     <div className="lp-badge-blue mb-6">{t.petsBadge}</div>
                     <h2 className="text-4xl md:text-5xl font-bold mb-5 leading-tight" style={{ color: '#0C1141' }}>
                         {t.petsTitle1}<br />
@@ -932,17 +957,17 @@ function HowItWorksSection() {
     ]
 
     return (
-        <section id="how" className="py-28 px-6 bg-white">
+        <section id="how" className="py-16 px-6 bg-white">
             <div className="lp-divider mb-0" />
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-20 lp-reveal">
+                <div className="text-center mb-12 lp-reveal">
                     <div className="lp-badge-orange mb-6">{t.howBadge}</div>
                     <h2 className="text-4xl md:text-5xl font-bold mb-5 leading-tight" style={{ color: '#0C1141' }}>
                         {t.howTitle1}<br /><span style={{ color: '#FA8A38' }}>{t.howTitle2}</span>
                     </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
                     {t.steps.map((s, i) => (
                         <div key={i} className="lp-reveal flex flex-col items-center text-center" style={{ transitionDelay: `${i * 0.12}s` }}>
                             <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl mb-5 relative" style={{ background: meta[i].bg, border: `2px solid ${meta[i].color}25` }}>
@@ -1013,9 +1038,9 @@ function StatsSection() {
         .filter((item) => item.rawValue > 0)
 
     return (
-        <section ref={ref} className="py-24 px-6" style={{ background: '#F7F8FF' }}>
+        <section ref={ref} className="py-16 px-6" style={{ background: '#F7F8FF' }}>
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-14 lp-reveal">
+                <div className="text-center mb-10 lp-reveal">
                     <h2 className="text-3xl md:text-5xl font-bold" style={{ color: '#0C1141' }}>
                         {t.statsTitle1} <span className="lp-gradient-text">{t.statsTitle2}</span>
                     </h2>
@@ -1049,7 +1074,7 @@ function PrivacySection() {
     ]
 
     return (
-        <section id="privacy" className="py-28 px-6 bg-white">
+        <section id="privacy" className="py-16 px-6 bg-white">
             <div className="lp-divider mb-0" />
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
@@ -1093,9 +1118,9 @@ function TestimonialsSection() {
     const doubled = [...testi, ...testi]
 
     return (
-        <section className="py-28 px-6 overflow-hidden" style={{ background: '#F7F8FF' }}>
+        <section className="py-16 px-6 overflow-hidden" style={{ background: '#F7F8FF' }}>
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-20 lp-reveal">
+                <div className="text-center mb-12 lp-reveal">
                     <div className="lp-badge-orange mb-6">{t.testiBadge}</div>
                     <h2 className="text-4xl md:text-5xl font-bold leading-tight" style={{ color: '#0C1141' }}>
                         {t.testiTitle1}<br /><span className="lp-gradient-text">{t.testiTitle2}</span>
@@ -1132,7 +1157,7 @@ function TestimonialsSection() {
 function DownloadSection() {
     const { t } = useLang()
     return (
-        <section className="py-28 px-6 relative overflow-hidden" style={{ background: 'linear-gradient(150deg, #EEF0FF 0%, #F0EDFF 40%, #FFF5EE 100%)' }}>
+        <section className="py-16 px-6 relative overflow-hidden" style={{ background: 'linear-gradient(150deg, #EEF0FF 0%, #F0EDFF 40%, #FFF5EE 100%)' }}>
             <div className="lp-divider mb-0" />
             <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                 <div className="w-[600px] h-[600px] rounded-full opacity-30" style={{ background: 'radial-gradient(circle, rgba(72,59,252,0.15) 0%, rgba(250,138,56,0.08) 50%, transparent 70%)' }} />
