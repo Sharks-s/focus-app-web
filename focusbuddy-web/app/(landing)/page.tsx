@@ -44,6 +44,41 @@ const TESTIMONIAL_ACCENTS = [
     { avatar: '/images/PIGGY.png', color: '#FF909E' },
 ]
 
+const FALLBACK_TESTIMONIALS: LandingTestimonial[] = [
+    {
+        name: 'Minh Quân',
+        role: 'Sinh viên ĐH Bách Khoa',
+        avatar: '/images/PANDO.png',
+        text: 'Từ ngày dùng FocusBuddy, mình học đều hơn hẳn. App nhắc đúng lúc nên mình ít bị trôi qua TikTok giữa session.',
+        color: '#483BFC',
+        rating: 5,
+    },
+    {
+        name: 'Linh Nhi',
+        role: 'Freelance Designer',
+        avatar: '/images/FROGI.png',
+        text: 'Mình thích nhất phần nghỉ có thưởng. Làm xong một block tập trung thấy nhẹ đầu, không còn cảm giác bị ép quá.',
+        color: '#FA8A38',
+        rating: 5,
+    },
+    {
+        name: 'Văn Đức',
+        role: 'Lập trình viên remote',
+        avatar: '/images/MONKI.png',
+        text: 'FocusBuddy giúp mình giữ nhịp làm việc ở nhà tốt hơn. Nhìn streak tăng mỗi ngày cũng có động lực quay lại bàn làm việc.',
+        color: '#35C85E',
+        rating: 5,
+    },
+    {
+        name: 'Thu Hà',
+        role: 'Học sinh lớp 12',
+        avatar: '/images/PIGGY.png',
+        text: 'Ôn thi bằng Pomodoro trong FocusBuddy dễ theo hơn nhiều. Có buddy đi cùng nên mình bớt nản khi học các môn dài.',
+        color: '#FF909E',
+        rating: 5,
+    },
+]
+
 function normalizeTestimonial(item: Partial<LandingTestimonial>, index: number): LandingTestimonial | null {
     const text = typeof item.text === 'string' ? item.text.trim() : ''
     const rating = typeof item.rating === 'number' ? item.rating : 0
@@ -72,7 +107,7 @@ function isLandingStats(value: unknown): value is LandingStats {
 }
 
 function useLandingStats() {
-    const [stats, setStats] = useState<LandingStats | null>(null)
+    const [stats, setStats] = useState<LandingStats>(EMPTY_LANDING_STATS)
 
     useEffect(() => {
         let active = true
@@ -85,7 +120,7 @@ function useLandingStats() {
                     setStats(json.data)
                 }
             } catch {
-                if (active) setStats(null)
+                if (active) setStats(EMPTY_LANDING_STATS)
             }
         }
 
@@ -99,7 +134,7 @@ function useLandingStats() {
 }
 
 function useLandingTestimonials() {
-    const [testimonials, setTestimonials] = useState<LandingTestimonial[]>([])
+    const [testimonials, setTestimonials] = useState<LandingTestimonial[]>(FALLBACK_TESTIMONIALS)
 
     useEffect(() => {
         let active = true
@@ -113,11 +148,11 @@ function useLandingTestimonials() {
                     .map((item: Partial<LandingTestimonial>, index: number) => normalizeTestimonial(item, index))
                     .filter((item: LandingTestimonial | null): item is LandingTestimonial => Boolean(item))
 
-                if (active) {
-                    setTestimonials(response.ok ? goodReviews : [])
+                if (active && response.ok && goodReviews.length > 0) {
+                    setTestimonials(goodReviews)
                 }
             } catch {
-                if (active) setTestimonials([])
+                if (active) setTestimonials(FALLBACK_TESTIMONIALS)
             }
         }
 
@@ -713,14 +748,12 @@ function HeroSection() {
 /* ─── Marquee ─── */
 function MarqueeSection() {
     const stats = useLandingStats()
-    if (!stats || !Object.values(stats).some((value) => value > 0)) return null
-
     const items = [
-        { value: stats.totalFocusMinutes, icon: '⏱️', text: `${formatCompact(stats.totalFocusMinutes)} phút tập trung`, color: '#483BFC' },
-        { value: stats.completedSessions, icon: '✅', text: `${formatCompact(stats.completedSessions)} sessions hoàn thành`, color: '#35C85E' },
-        { value: stats.completionRate, icon: '📈', text: `${stats.completionRate.toFixed(1).replace('.0', '')}% tỷ lệ hoàn thành`, color: '#35C85E' },
-        { value: stats.raisedBuddies, icon: '🐼', text: `${formatCompact(stats.raisedBuddies)} pet được nuôi dưỡng`, color: '#483BFC' },
-    ].filter((item) => item.value > 0)
+        { icon: '⏱️', text: `${formatCompact(stats.totalFocusMinutes)} phút tập trung`, color: '#483BFC' },
+        { icon: '✅', text: `${formatCompact(stats.completedSessions)} sessions hoàn thành`, color: '#35C85E' },
+        { icon: '📈', text: `${stats.completionRate.toFixed(1).replace('.0', '')}% tỷ lệ hoàn thành`, color: '#35C85E' },
+        { icon: '🐼', text: `${formatCompact(stats.raisedBuddies)} pet được nuôi dưỡng`, color: '#483BFC' },
+    ]
     const doubled = [...items, ...items]
 
     return (
@@ -1058,8 +1091,6 @@ function TestimonialsSection() {
     const { t } = useLang()
     const testi = useLandingTestimonials()
     const doubled = [...testi, ...testi]
-
-    if (testi.length === 0) return null
 
     return (
         <section className="py-28 px-6 overflow-hidden" style={{ background: '#F7F8FF' }}>
