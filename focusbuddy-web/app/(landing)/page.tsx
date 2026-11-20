@@ -235,9 +235,6 @@ const translations = {
         ],
         cycleLabel: 'Chu kỳ Pomodoro',
         cycleNote: 'Mỗi lần học 25 phút bạn nhận 5 phút nghỉ, tích lũy thời gian nghỉ để nhận kinh nghiệm nâng cấp Buddy',
-        statsTitle1: 'Con số',
-        statsTitle2: 'nói lên tất cả',
-        statsLabels: ['Phút tập trung đã ghi nhận', 'Sessions Pomodoro hoàn thành', 'Tỷ lệ hoàn thành session', 'Buddy ảo đã được nuôi dưỡng'],
         privacyBadge: 'Bảo mật & Riêng tư',
         privacyTitle1: 'Camera của bạn,',
         privacyTitle2: 'bí mật của bạn',
@@ -329,9 +326,6 @@ const translations = {
         ],
         cycleLabel: 'Pomodoro cycle',
         cycleNote: 'Every 25-minute session earns you 5 minutes of break, which accumulates into XP to level up your Buddy',
-        statsTitle1: 'The numbers',
-        statsTitle2: 'speak for themselves',
-        statsLabels: ['Minutes of focus recorded', 'Pomodoro sessions completed', 'Session completion rate', 'Virtual buddies raised'],
         privacyBadge: 'Security & Privacy',
         privacyTitle1: 'Your camera,',
         privacyTitle2: 'your secret',
@@ -438,36 +432,6 @@ function useScrollReveal() {
             io.disconnect()
         }
     }, [])
-}
-
-function useInView(ref: React.RefObject<HTMLElement | null>) {
-    const [v, setV] = useState(false)
-    useEffect(() => {
-        const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true) }, { threshold: 0.3 })
-        if (ref.current) io.observe(ref.current)
-        return () => io.disconnect()
-    }, [ref])
-    return v
-}
-
-function useCountUp(target: number, trigger: boolean, ms = 2000) {
-    const [n, setN] = useState(0)
-    useEffect(() => {
-        if (!trigger) return
-        let cur = 0
-        const step = target / (ms / 16)
-        const id = setInterval(() => {
-            cur += step
-            if (cur >= target) {
-                setN(target)
-                clearInterval(id)
-            } else {
-                setN(Math.floor(cur))
-            }
-        }, 16)
-        return () => clearInterval(id)
-    }, [target, trigger, ms])
-    return n
 }
 
 function useMousePos(ref: React.RefObject<HTMLElement | null>) {
@@ -1008,59 +972,6 @@ function HowItWorksSection() {
     )
 }
 
-/* ─── Stats ─── */
-function StatsSection() {
-    const { t } = useLang()
-    const stats = useLandingStats()
-    const safeStats = stats ?? EMPTY_LANDING_STATS
-    const ref = useRef<HTMLDivElement>(null)
-    const inView = useInView(ref)
-    const n1 = useCountUp(safeStats.totalFocusMinutes, inView, 2500)
-    const n2 = useCountUp(safeStats.completedSessions, inView, 2200)
-    const n3 = useCountUp(safeStats.completionRate, inView, 1800)
-    const n4 = useCountUp(safeStats.raisedBuddies, inView, 2000)
-
-    if (!stats || !Object.values(stats).some((value) => value > 0)) return null
-
-    const values = [formatCompact(n1), formatCompact(n2), n3.toFixed(1).replace('.0', ''), formatCompact(n4)]
-    const suffixes = ['', '', '%', '']
-    const meta = [
-        { color: '#483BFC', bg: '#EEF0FF', icon: '📊' },
-        { color: '#FA8A38', bg: '#FFF3EA', icon: '✅' },
-        { color: '#35C85E', bg: '#EDFAF2', icon: '📈' },
-        { color: '#FF909E', bg: '#FFF0F2', icon: '🐼' },
-    ]
-    const rawValues = [safeStats.totalFocusMinutes, safeStats.completedSessions, safeStats.completionRate, safeStats.raisedBuddies]
-    const visibleStats = t.statsLabels
-        .map((label, index) => ({ label, value: values[index], suffix: suffixes[index], meta: meta[index], rawValue: rawValues[index] }))
-        .filter((item) => item.rawValue > 0)
-
-    return (
-        <section ref={ref} className="py-16 px-6" style={{ background: '#F7F8FF' }}>
-            <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-10 lp-reveal">
-                    <h2 className="text-3xl md:text-5xl font-bold" style={{ color: '#0C1141' }}>
-                        {t.statsTitle1} <span className="lp-gradient-text">{t.statsTitle2}</span>
-                    </h2>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                    {visibleStats.map((item, i) => (
-                        <div key={item.label} className="lp-spotlight-card lp-card p-7 text-center lp-reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
-                            <div className="w-12 h-12 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl" style={{ background: item.meta.bg }}>
-                                {item.meta.icon}
-                            </div>
-                            <div className="font-bold text-3xl md:text-4xl mb-1" style={{ color: item.meta.color }}>
-                                {item.value}{item.suffix}
-                            </div>
-                            <p className="text-xs font-semibold leading-snug" style={{ color: '#9ca3af' }}>{item.label}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    )
-}
-
 /* ─── Privacy ─── */
 function PrivacySection() {
     const { t } = useLang()
@@ -1267,7 +1178,6 @@ export default function LandingPage() {
                     <FeaturesSection />
                     <PetSection />
                     <HowItWorksSection />
-                    <StatsSection />
                     <PrivacySection />
                     <TestimonialsSection />
                     <DownloadSection />
