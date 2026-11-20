@@ -861,8 +861,6 @@ const PETS = [
     { img: '/images/PIGGY.png', name: 'Piggy', role: 'Pig', personality: 'Dễ thương & Cổ vũ', color: '#FF909E', bg: '#FFF0F2', level: 5, xp: 180, quote: 'Bạn đã làm rất tốt rồi! Piggy tự hào về bạn lắm 🩷' },
 ]
 
-const SHOW_MOCK_PET_DETAILS = false
-
 function PetSection() {
     const { t } = useLang()
     const [active, setActive] = useState(0)
@@ -1267,7 +1265,7 @@ export default function LandingPage() {
                     <HeroSection />
                     <MarqueeSection />
                     <FeaturesSection />
-                    {SHOW_MOCK_PET_DETAILS && <PetSection />}
+                    <PetSection />
                     <HowItWorksSection />
                     <StatsSection />
                     <PrivacySection />
